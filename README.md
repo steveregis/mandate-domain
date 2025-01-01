@@ -1,4 +1,4 @@
-echo "# Mandate Management System (Minimal Yet Extensible)
+"# Mandate Management System (Minimal Yet Extensible)
 
 A **Spring Boot + Camunda + React** (or React Native) application for **bank mandate** management and **approval workflows**. This solution is a **solid foundation** for multi-sign-off approvals, featuring flexible signatories (no role hardcoding), 
 threshold-based logic, and a proof-of-concept UI to validate core domain models and BPMN flows.
@@ -30,50 +30,62 @@ threshold-based logic, and a proof-of-concept UI to validate core domain models 
 
 ### 2.2 Backend Setup
 
-\`\`\`bash
 # 1) Clone or download the repository
-git clone https://github.com/YourOrg/mandate-system.git
+
+```bash
+git clone https://github.com/steveregis/mandate-system.git
+```
 
 # 2) Go into the backend folder
+```bash
 cd mandate-system/mandate-backend
+```
 
 # 3) Build and package
+```bash
 mvn clean package
+```
 
 # 4) Run the Spring Boot app
+
+```bash
 mvn spring-boot:run
-\`\`\`
+```
 
 The backend typically listens on http://localhost:8080.
 Check logs for \`ENGINE-07015 Detected process application...\` to confirm Camunda BPMN deployment.
 
 ### 2.3 Frontend Setup
 
-\`\`\`bash
 # 1) Go into the frontend folder
+
+```bash
 cd mandate-system/mandate-frontend
-
+```
 # 2) Install dependencies
+```bash
 npm install
-
+```
 # 3) Start the dev server
+```bash
 npm start
-\`\`\`
+```
 
 The frontend typically loads at http://localhost:3000.
 Log in using Basic Auth credentials (e.g., admin:secret).
 
 Sample UI Routes:
-- \`/mandates\` – list existing mandates
-- \`/mandates/create\` – create a new mandate
-- \`/signatories\` – list signatories
-- \`/signatories/create\` – create a new signatory
-- \`/rules\` – list approval rules
-- \`/rules/create\` – create a new approval rule
-- \`/create-transaction\` – create a new transaction
-- \`/start-process\` – start the BPMN for a transaction
-- \`/workflow-tasks\` – see tasks (assign, complete)
-- \`/transaction-status\` – track transaction statuses
+
+/mandates – list existing mandates
+/mandates/create – create a new mandate
+/signatories – list signatories
+/signatories/create – create a new signatory
+/rules – list approval rules
+/rules/create – create a new approval rule
+/create-transaction – create a new transaction
+/start-process – start the BPMN for a transaction
+/workflow-tasks – see tasks (assign, complete)
+/transaction-status – track transaction statuses
 
 ### 2.4 Database
 
@@ -101,7 +113,7 @@ For production, adapt to PostgreSQL or MySQL, add DB migrations (e.g., Flyway).
 ### 3.2 API Testing (Curl / Postman)
 
 Create Mandate:
-\`\`\`bash
+```bash
 curl -X POST http://localhost:8080/api/mandates \
      -u admin:secret \
      -H "Content-Type: application/json" \
@@ -110,10 +122,10 @@ curl -X POST http://localhost:8080/api/mandates \
        "validFrom": "2024-01-01",
        "validTo": "2024-12-31"
      }'
-\`\`\`
+```
 
 Create Signatory:
-\`\`\`bash
+```bash
 curl -X POST http://localhost:8080/api/signatories/mandate/1 \
      -u admin:secret \
      -H "Content-Type: application/json" \
@@ -122,10 +134,10 @@ curl -X POST http://localhost:8080/api/signatories/mandate/1 \
        "displayName": "Jack Smith",
        "roleName": "FinanceApprover"
      }'
-\`\`\`
+```
 
 Create a Transaction:
-\`\`\`bash
+```bash
 curl -X POST http://localhost:8080/api/transactions/mandate/1 \
      -u admin:secret \
      -H "Content-Type: application/json" \
@@ -134,30 +146,30 @@ curl -X POST http://localhost:8080/api/transactions/mandate/1 \
        "currency": "USD",
        "status": "INITIATED"
      }'
-\`\`\`
+```
 
 Start Workflow:
-\`\`\`bash
+```bash
 curl -X POST "http://localhost:8080/api/workflow/start-transaction-process?transactionId=1" \
      -u admin:secret
-\`\`\`
+```
 
 List Tasks:
-\`\`\`bash
+```bash
 curl http://localhost:8080/api/workflow/tasks -u admin:secret
-\`\`\`
+```
 
 Claim a Task:
-\`\`\`bash
+```bash
 curl -X POST "http://localhost:8080/api/workflow/tasks/{taskId}/claim?userId=jack" \
      -u jack:secret
-\`\`\`
+```
 
 Complete a Task:
-\`\`\`bash
+```bash
 curl -X POST "http://localhost:8080/api/workflow/tasks/{taskId}/complete" \
      -u jack:secret
-\`\`\`
+```
 
 Use \`-u admin:secret\` (or relevant credentials) for Basic Auth.
 
