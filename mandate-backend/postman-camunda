@@ -1,0 +1,170 @@
+{
+    "info": {
+      "name": "Camunda Engine REST",
+      "_postman_id": "96c945d9-c443-40ab-99ca-70cefc693027",
+      "description": "A sample collection to interact directly with Camunda engine-rest endpoints",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "1) Deploy BPMN",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "multipart/form-data"
+            }
+          ],
+          "body": {
+            "mode": "formdata",
+            "formdata": [
+              {
+                "key": "deployment-name",
+                "value": "myDeployment",
+                "type": "text"
+              },
+              {
+                "key": "deploy-changed-only",
+                "value": "true",
+                "type": "text"
+              },
+              {
+                "key": "file",
+                "type": "file",
+                "src": "/Users/astregis/Documents/mandate-domain/mandate-backend/src/main/resources/approvalProcess.bpmn" 
+              }
+            ]
+          },
+          "url": {
+            "raw": "http://localhost:8080/engine-rest/deployment/create",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "8080",
+            "path": [
+              "engine-rest",
+              "deployment",
+              "create"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "2) Start Process Instance by Key",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"variables\": {\n        \"amount\": { \"value\": 15000, \"type\": \"Integer\" },\n        \"transactionId\": { \"value\": 42, \"type\": \"Long\" },\n        \"signatoryUsernames\": {\n            \"value\": [\"userA\", \"userB\"],\n            \"type\": \"Object\",\n            \"valueInfo\": { \"serializationDataFormat\": \"application/json\", \"objectTypeName\": \"java.util.ArrayList\" }\n        }\n    }\n}"
+          },
+          "url": {
+            "raw": "http://localhost:8080/engine-rest/process-definition/key/approvalProcess/start",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "8080",
+            "path": [
+              "engine-rest",
+              "process-definition",
+              "key",
+              "approvalProcess",
+              "start"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "3) List Tasks",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:8080/engine-rest/task",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "8080",
+            "path": [
+              "engine-rest",
+              "task"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "4) Claim Task",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"userId\": \"demo\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:8080/engine-rest/task/:taskId/claim",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "8080",
+            "path": [
+              "engine-rest",
+              "task",
+              ":taskId",
+              "claim"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "5) Complete Task",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"variables\": {\n    \"approvalDecision\": { \"value\": \"approved\", \"type\": \"String\" }\n  }\n}"
+          },
+          "url": {
+            "raw": "http://localhost:8080/engine-rest/task/:taskId/complete",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "8080",
+            "path": [
+              "engine-rest",
+              "task",
+              ":taskId",
+              "complete"
+            ]
+          }
+        },
+        "response": []
+      }
+    ]
+  }

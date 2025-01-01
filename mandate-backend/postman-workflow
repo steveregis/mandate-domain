@@ -1,0 +1,70 @@
+{
+  "info": {
+    "_postman_id": "7f1156a3-fff1-4f9c-9231-59fdfe036cef",
+    "name": "WorkflowController Postman Collection",
+    "description": "Collection of requests for the WorkflowController endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Start Approval (mandateId)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/workflow/start?mandateId=1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "workflow",
+            "start"
+          ],
+          "query": [
+            {
+              "key": "mandateId",
+              "value": "1",
+              "description": "ID of the mandate to start the approval process for."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Start Transaction Approval (transactionId)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/workflow/start-transaction-process?transactionId=123",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "workflow",
+            "start-transaction-process"
+          ],
+          "query": [
+            {
+              "key": "transactionId",
+              "value": "123",
+              "description": "ID of the transaction to start the approval process for."
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

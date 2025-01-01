@@ -1,0 +1,151 @@
+{
+  "info": {
+    "name": "Transaction BPMN Test Collection",
+    "_postman_id": "abc12345-6789-4a5b-8f00-123456789abc",
+    "description": "Covers creating a transaction, starting the workflow, listing tasks, claiming, completing, and verifying the transaction status.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1) Create Transaction (Mandate ID = 1)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Basic YWRtaW46c2VjcmV0",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"amount\": 15000,\n    \"currency\": \"USD\",\n    \"status\": \"INITIATED\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/transactions/mandate/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "transactions", "mandate", "1"]
+        }
+      }
+    },
+    {
+      "name": "2) Start Transaction Process (txnId=42)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Basic YWRtaW46c2VjcmV0",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/workflow/start-transaction-process?transactionId=42",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "workflow", "start-transaction-process"],
+          "query": [
+            {
+              "key": "transactionId",
+              "value": "42"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "3) List All Tasks",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Basic YWRtaW46c2VjcmV0",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/workflow/tasks",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "workflow", "tasks"]
+        }
+      }
+    },
+    {
+      "name": "4) Claim Task (example taskId=abc123, user=cfo)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Basic YWRtaW46c2VjcmV0",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/workflow/tasks/abc123/claim?userId=cfo",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "workflow", "tasks", "abc123", "claim"],
+          "query": [
+            {
+              "key": "userId",
+              "value": "cfo"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "5) Complete Task (example taskId=abc123)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Basic YWRtaW46c2VjcmV0",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/workflow/tasks/abc123/complete",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "workflow", "tasks", "abc123", "complete"]
+        }
+      }
+    },
+    {
+      "name": "6) Get Transaction By ID (check status)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Basic YWRtaW46c2VjcmV0",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/transactions/42",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "transactions", "42"]
+        }
+      }
+    }
+  ]
+}

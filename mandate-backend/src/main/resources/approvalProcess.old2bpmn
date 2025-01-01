@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+    xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+    xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL 
+                        http://www.omg.org/spec/BPMN/20100524/BPMN20.xsd"
+    id="Definitions_Example"
+    targetNamespace="http://camunda.org/examples">
+    <!-- 
+    A flexible process that checks 'amount' to decide single vs. multi sign-off.
+    If 'amount' <= 10000, do a single user task with candidate group "APPROVERS".
+    If 'amount' > 10000, do a multi-instance task that loops over 'signatoryUsernames' collection.
+    No references to CFO/Treasurer; we rely on your DB or code to provide the actual user list.
+  -->
+    <process id="approvalProcess" name="Approval Process" isExecutable="true" camunda:historyTimeToLive="30">
+        <!-- START EVENT -->
+        <startEvent id="StartEvent_1" name="Start Approval" />
+        <!-- FLOW FROM START TO EXCLUSIVE GATEWAY -->
+        <sequenceFlow id="flow_start" sourceRef="StartEvent_1" targetRef="CheckAmountGateway" />
+            <!-- EXCLUSIVE GATEWAY TO CHECK 'amount' -->
+            <exclusiveGateway id="CheckAmountGateway" name="Check Amount" />
+            <!-- PATH A: amount <= 10000 => Single Task -->
+        <sequenceFlow id="flow_below" sourceRef="CheckAmountGateway" targetRef="UserTask_SingleSignoff">
+            <conditionExpression xsi:type="tFormalExpression">
+            <![CDATA[#{amount <= 10000}]]>
+            </conditionExpression>
+        </sequenceFlow>
+            <userTask id="UserTask_SingleSignoff" name="Single Sign-off" camunda:candidateGroups="APPROVERS">
+                <documentation>If 'amount'
+                is less than or equal to 10000, only one sign-off from 'APPROVERS' group is needed.
+                </documentation>
+            </userTask>
+            <!-- FLOW FROM SINGLE TASK TO END -->
+        <sequenceFlow id="flow_single_done" sourceRef="UserTask_SingleSignoff" targetRef="EndEvent_Approved" />
+        <!-- PATH B: amount > 10000 => Multi-Instance Task -->
+        <sequenceFlow id="flow_above" sourceRef="CheckAmountGateway" targetRef="UserTask_MultiSign">
+            <conditionExpression xsi:type="tFormalExpression">
+            <![CDATA[#{amount > 10000}]]>
+            </conditionExpression>
+        </sequenceFlow>
+        <!-- MULTI-INSTANCE USER TASK -->
+        <userTask id="UserTask_MultiSign" name="Multiple Sign-Off" camunda:assignee="${currentUser}">
+            <documentation>If 'amount' greater than 10000, loop over signatoryUsernames array to create parallel tasks.</documentation>
+            <!-- Multi-Instance Config -->
+            <multiInstanceLoopCharacteristics camunda:collection="${signatoryUsernames}" camunda:elementVariable="currentUser" isSequential="false">
+                <!-- All parallel tasks must be completed -->
+                <completionCondition xsi:type="tFormalExpression">
+                    <![CDATA[#{nrOfCompletedInstances == nrOfInstances}]]>
+                </completionCondition>
+            </multiInstanceLoopCharacteristics>
+            <!-- For Camunda 7, you can do: 
+            <camunda:assignee xsi:type="camunda:expression">
+                <![CDATA[${currentUser}]]>
+            </camunda:assignee> -->
+        </userTask>
+        <!-- FLOW FROM MULTI-INSTANCE TASK TO END -->
+        <sequenceFlow id="flow_multi_done" sourceRef="UserTask_MultiSign" targetRef="EndEvent_Approved" />
+        <!-- END EVENT (APPROVED) -->
+        <endEvent id="EndEvent_Approved" name="Approved" />
+    </process>
+    <!-- OPTIONAL BPMN DIAGRAM ELEMENTS (FOR DI) -->
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="approvalProcess">
+        <!-- If you open in Camunda Modeler, it will generate or update shape positions -->
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>

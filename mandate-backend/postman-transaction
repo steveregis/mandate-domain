@@ -1,0 +1,158 @@
+{
+  "info": {
+    "name": "Transaction Collection",
+    "_postman_id": "2a4f96af-0000-4a52-9c3c-722a17400000",
+    "description": "Demonstrates the Transaction endpoints in mandate-backend, using Basic Auth for admin:secret.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All Transactions",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Basic YWRtaW46c2VjcmV0",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/transactions",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transactions"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Transaction By ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Basic YWRtaW46c2VjcmV0",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/transactions/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transactions",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Transaction (Mandate ID = 1)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Basic YWRtaW46c2VjcmV0",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"amount\": 12000,\n    \"currency\": \"USD\",\n    \"status\": \"INITIATED\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/transactions/mandate/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transactions",
+            "mandate",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Update Transaction (ID = 1)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Basic YWRtaW46c2VjcmV0",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"amount\": 15000,\n    \"currency\": \"EUR\",\n    \"status\": \"PENDING_APPROVAL\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/transactions/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transactions",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Delete Transaction (ID = 1)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Basic YWRtaW46c2VjcmV0",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/transactions/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transactions",
+            "1"
+          ]
+        }
+      }
+    }
+  ]
+}

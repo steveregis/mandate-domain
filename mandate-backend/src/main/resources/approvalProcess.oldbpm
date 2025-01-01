@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+    xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+    xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL 
+                        http://www.omg.org/spec/BPMN/20100524/BPMN20.xsd"
+    id="Definitions_Example"
+    targetNamespace="http://camunda.org/examples">
+    <!-- 
+    This process checks 'amount' to decide if we do single or parallel sign-off.
+    'amount' is a process variable, e.g. set via runtimeService.startProcessInstanceByKey("approvalProcess", vars).
+  -->
+    <process id="approvalProcess" name="Approval Process" isExecutable="true" camunda:historyTimeToLive="120">
+        <!-- START EVENT -->
+        <startEvent id="StartEvent_1" name="Start Approval" />
+        <!-- SEQUENCE FLOW FROM START TO EXCLUSIVE GATEWAY -->
+        <sequenceFlow id="flow1" sourceRef="StartEvent_1" targetRef="ExclusiveGateway_Threshold" />
+        <!-- EXCLUSIVE GATEWAY CHECKING AMOUNT -->
+        <exclusiveGateway id="ExclusiveGateway_Threshold" name="Check Amount" />
+        <!-- FLOW A: amount <= 10000 -->
+        <sequenceFlow id="flow_below" name="Below 10000" sourceRef="ExclusiveGateway_Threshold" targetRef="UserTask_LowAmount">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[#{amount <= 10000}]]>
+            </conditionExpression>
+        </sequenceFlow>
+        <!-- FLOW B: amount > 10000 -->
+        <sequenceFlow id="flow_above" name="Greater than 10000" sourceRef="ExclusiveGateway_Threshold" targetRef="ParallelGateway_Fork">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[#{amount > 10000}]]>
+            </conditionExpression>
+        </sequenceFlow>
+        <!-- USER TASK FOR LOW AMOUNT PATH -->
+        <userTask id="UserTask_LowAmount" name="Single Sign-off" camunda:candidateGroups="APPROVERS">
+            <documentation>If amount less than or equal to 10000, only a single user task is required.
+            </documentation>
+        </userTask>
+        <!-- FLOW FROM LOW AMOUNT USER TASK TO END EVENT -->
+        <sequenceFlow id="flow2" sourceRef="UserTask_LowAmount" targetRef="EndEvent_Approved" />
+            <!-- PARALLEL GATEWAY (FORK) FOR HIGH AMOUNT -->
+            <parallelGateway id="ParallelGateway_Fork" name="Parallel Sign-off" />
+            <!-- FLOW FROM PARALLEL GATEWAY TO CFO USER TASK -->
+            <sequenceFlow id="flow3a" sourceRef="ParallelGateway_Fork" targetRef="UserTask_CFO" />
+            <!-- FLOW FROM PARALLEL GATEWAY TO TREASURER USER TASK -->
+            <sequenceFlow id="flow3b" sourceRef="ParallelGateway_Fork" targetRef="UserTask_Treasurer" />
+            <!-- USER TASK FOR CFO -->
+            <userTask id="UserTask_CFO" name="CFO Approval" camunda:candidateUsers="cfo">
+                <documentation>High-amount scenario: CFO must approve.</documentation>
+            </userTask>
+            <!-- FLOW FROM CFO TASK TO PARALLEL JOIN GATEWAY -->
+            <sequenceFlow id="flow4a" sourceRef="UserTask_CFO" targetRef="ParallelGateway_Join" />
+            <!-- USER TASK FOR TREASURER -->
+            <userTask id="UserTask_Treasurer" name="Treasurer Approval" camunda:candidateUsers="treasurer">
+                <documentation>High-amount scenario: Treasurer must also approve.</documentation>
+            </userTask>
+            <!-- FLOW FROM TREASURER TASK TO PARALLEL JOIN GATEWAY -->
+            <sequenceFlow id="flow4b" sourceRef="UserTask_Treasurer" targetRef="ParallelGateway_Join" />
+            <!-- PARALLEL GATEWAY (JOIN) -->
+            <parallelGateway id="ParallelGateway_Join" name="Join Sign-off" />
+            <!-- FLOW FROM JOIN TO END EVENT -->
+            <sequenceFlow id="flow5" sourceRef="ParallelGateway_Join" targetRef="EndEvent_Approved" />
+            <!-- END EVENT (APPROVED) -->
+            <endEvent id="EndEvent_Approved" name="Approved" />
+        </process>
+        <!-- OPTIONAL BPMN DIAGRAM ELEMENTS (SHOWING GRAPHICAL LAYOUT) -->
+        <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+            <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="approvalProcess">
+                <!-- 
+        The <bpmndi> elements define the coordinates for each shape.
+        If you open this in Camunda Modeler, it will auto-generate or update them. 
+        For brevity, these are omitted or minimal in this snippet. 
+      -->
+            </bpmndi:BPMNPlane>
+        </bpmndi:BPMNDiagram>
+    </definitions>
