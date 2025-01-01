@@ -35,6 +35,8 @@ threshold-based logic, and a proof-of-concept UI to validate core domain models 
 ```bash
 git clone https://github.com/steveregis/mandate-system.git
 ```
+or 
+git clone git@github.com:steveregis/mandate-domain.git
 
 # 2) Go into the backend folder
 ```bash
