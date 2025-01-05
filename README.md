@@ -3,6 +3,8 @@
 A **Spring Boot + Camunda + React** (or React Native) application for **bank mandate** management and **approval workflows**. This solution is a **solid foundation** for multi-sign-off approvals, featuring flexible signatories (no role hardcoding), 
 threshold-based logic, and a proof-of-concept UI to validate core domain models and BPMN flows.
 
+Also includes a POC **FastAPI** application that leverages the **NVIDIA Mixtral model** to provide **intelligent parsing and conversion of natural language rules into FEEL expressions and DMN decision tables**.
+
 ## 1. Project Goal & Description
 
 ### Goal
@@ -10,16 +12,20 @@ threshold-based logic, and a proof-of-concept UI to validate core domain models 
 - Provide an **end-to-end** system that captures **Mandates** (authorization rules), **Signatories** (flexible user references), **Approval Rules**, and **Transactions** (amount, currency, referencing a Mandate).
 - Use **Camunda BPMN** to enforce single or multi-sign-off (e.g., \`amount <= 10000\` → single, \`> 10000\` → multi-instance).
 - Offer a **minimal** React (or React Native) frontend to test tasks (claim, complete), verify domain logic, and track transaction statuses.
+- Offer a **POC** of a Rule Assistant to help the user create approval rules enabling self-care 
 
 ### Scope
 
 - **Spring Boot** backend with **Camunda** embedded.
 - **React** front end for listing/creating mandates, signatories, rules, transactions, starting processes, viewing tasks, and checking transaction statuses.
 - **Basic Auth** for quick testing (in-memory or simple credentials).
+- **FastAPI** for quick POC of a Rule Assistant
 
-> **Note**: While the UI is minimal, it allows you to **validate** domain logic and BPMN flows before investing in a full production interface.
+> **Note**: While the UI is minimal, it allows you to **validate** domain logic and BPMN flows before investing in a full production interface. Also the FastAPI app POC is to understand the suitability of NVIDIA Mixtral model to enable end user . there are other suitable models to consider as well based on this 
 
 ## 2. Getting Started
+
+> **Note**: for Getting started with the POC Rule Assistant please follow README.md instruction in manadate-airule
 
 ### 2.1 Prerequisites
 
@@ -27,6 +33,7 @@ threshold-based logic, and a proof-of-concept UI to validate core domain models 
 - **Maven**
 - **Node.js** + **npm** (for the React front end)
 - **Camunda** (embedded via Spring Boot dependencies)
+  
 
 ### 2.2 Backend Setup
 
@@ -659,6 +666,5 @@ How to Use:
 
 ## 7. Conclusion
 
-While the UI and auth are minimal, this project provides a strong foundation for domain logic (Mandate, Signatory, ApprovalRule, Transaction) and threshold-based BPMN flows. By adding key enhancements—such as advanced authentication and Docker 
-deployment—you can rapidly evolve this proof of concept into a robust enterprise-grade solution for bank mandates and multi-sign-off workflows." > README.md 
+This project provides a strong foundation for domain logic (Mandate, Signatory, ApprovalRule, Transaction) and threshold-based BPMN flows. By adding key enhancements—such as advanced authentication and Docker deployment—you can rapidly evolve this proof of concept into a robust enterprise-grade solution for bank mandates and multi-sign-off workflows. 
 
