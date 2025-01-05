@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { Container, Form, Button, Row, Col } from 'react-bootstrap';
+import '../styles/styles.css'; // Your custom CSS if needed
 import { BACKEND_URL } from '../config';
 
 function StartProcess({ authToken }) {
-  // If you want the user to specify who they are:
+  // If your /start-transaction-process endpoint expects 'initiator', keep it:
   const [initiator, setInitiator] = useState('');
 
   // We'll fetch all transactions so user can pick which transaction to start
@@ -13,17 +15,16 @@ function StartProcess({ authToken }) {
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
 
-  // On mount, fetch transactions for the dropdown
+  // Fetch transactions on mount (if logged in)
   useEffect(() => {
     if (!authToken) return;
 
-    // e.g. GET /api/transactions to list them
     fetch(`${BACKEND_URL}/api/transactions`, {
       headers: { Authorization: `Basic ${authToken}` }
     })
       .then(res => {
         if (!res.ok) {
-          throw new Error('Failed to fetch transactions');
+          throw new Error(`Failed to fetch transactions: ${res.status}`);
         }
         return res.json();
       })
@@ -36,8 +37,7 @@ function StartProcess({ authToken }) {
     setResult('');
     setError('');
 
-    // You decided to pass initiator, but your backend might or might not need it
-    // If your /start-transaction-process doesn't care about initiator, you can omit
+    // Build the URL. If your backend doesn't need initiator, omit it
     const url = `${BACKEND_URL}/api/workflow/start-transaction-process?transactionId=${selectedTransactionId}&initiator=${initiator}`;
 
     fetch(url, {
@@ -50,9 +50,9 @@ function StartProcess({ authToken }) {
         }
         return res.text();
       })
-      .then(data => {
+      .then(msg => {
         // e.g. "Started process <xyz> for transaction 123"
-        setResult(data);
+        setResult(msg);
       })
       .catch(err => setError(err.message));
   };
@@ -62,49 +62,57 @@ function StartProcess({ authToken }) {
   }
 
   return (
-    <div style={{ margin: '1rem' }}>
-      <h2>Start New Approval Process for a Transaction</h2>
+    <Container className="mt-4">
+      <h2 className="mb-4">Start New Approval Process</h2>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {result && <p style={{ color: 'green' }}>{result}</p>}
+      {error && <p className="text-danger">{error}</p>}
+      {result && <p className="text-success">{result}</p>}
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '0.5rem' }}>
-          <label>Initiator (Your Username): </label>
-          <input
-            type="text"
-            value={initiator}
-            onChange={e => setInitiator(e.target.value)}
-            placeholder="e.g. admin, cfo, etc."
-          />
-        </div>
+      <Form onSubmit={handleSubmit}>
+        {/* Initiator Field */}
+        <Form.Group as={Row} className="mb-3">
+          <Form.Label column sm="2">Initiator</Form.Label>
+          <Col sm="10">
+            <Form.Control
+              type="text"
+              value={initiator}
+              onChange={(e) => setInitiator(e.target.value)}
+              placeholder="e.g. admin, cfo, etc."
+            />
+          </Col>
+        </Form.Group>
 
-        <div style={{ marginBottom: '0.5rem' }}>
-          <label>Select a Transaction: </label>
-          {transactions.length > 0 ? (
-            <select
-              value={selectedTransactionId}
-              onChange={e => setSelectedTransactionId(e.target.value)}
-              required
-            >
-              <option value="">-- Select Transaction --</option>
-              {transactions.map(tx => (
-                <option key={tx.id} value={tx.id}>
-                  {/* Show transaction ID, plus maybe some Mandate info */}
-                  {tx.id} - Mandate: {tx.mandate?.id} - Account: {tx.mandate?.accountId} - Amount: {tx.amount}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <p>No transactions found. Please create one first.</p>
-          )}
-        </div>
+        {/* Transaction Select */}
+        <Form.Group as={Row} className="mb-3">
+          <Form.Label column sm="2">Select Transaction</Form.Label>
+          <Col sm="10">
+            {transactions.length > 0 ? (
+              <Form.Select
+                value={selectedTransactionId}
+                onChange={(e) => setSelectedTransactionId(e.target.value)}
+                required
+              >
+                <option value="">-- Select Transaction --</option>
+                {transactions.map(tx => (
+                  <option key={tx.id} value={tx.id}>
+                    {/* Show transaction ID, plus maybe some Mandate info */}
+                    {tx.id} - Mandate: {tx.mandate?.id} - 
+                    Account: {tx.mandate?.accountId} - 
+                    Amount: {tx.amount}
+                  </option>
+                ))}
+              </Form.Select>
+            ) : (
+              <p>No transactions found. Please create one first.</p>
+            )}
+          </Col>
+        </Form.Group>
 
-        <button type="submit" style={{ marginTop: '1rem' }}>
+        <Button variant="primary" type="submit">
           Start Workflow
-        </button>
-      </form>
-    </div>
+        </Button>
+      </Form>
+    </Container>
   );
 }
 

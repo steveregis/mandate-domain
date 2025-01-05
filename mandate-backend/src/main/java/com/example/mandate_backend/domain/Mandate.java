@@ -15,6 +15,7 @@ public class Mandate {
     private Long id;
 
     private String accountId;     // e.g. "ACCT-12345"
+    private String accountType;
     private String status;        // e.g. "ACTIVE", "SUSPENDED"
 
     private LocalDate validFrom;
@@ -34,8 +35,9 @@ public class Mandate {
     public Mandate() {
     }
 
-    public Mandate(String accountId, String status, LocalDate validFrom, LocalDate validTo) {
+    public Mandate(String accountId, String accountType, String status, LocalDate validFrom, LocalDate validTo) {
         this.accountId = accountId;
+        this.accountType = accountType;
         this.status = status;
         this.validFrom = validFrom;
         this.validTo = validTo;
@@ -60,6 +62,13 @@ public class Mandate {
     }
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getAccountType() {
+        return accountType;
+    }
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
     }
 
     public LocalDate getValidFrom() {

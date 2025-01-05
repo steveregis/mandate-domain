@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { Container, Table } from 'react-bootstrap';
+import '../styles/styles.css'; // your custom styles
 import { BACKEND_URL } from '../config';
 
 function TransactionStatus({ authToken }) {
@@ -11,7 +13,9 @@ function TransactionStatus({ authToken }) {
 
     // 1) Fetch all transactions
     fetch(`${BACKEND_URL}/api/transactions`, {
-      headers: { Authorization: `Basic ${authToken}` }
+      headers: {
+        Authorization: `Basic ${authToken}`
+      }
     })
       .then(res => {
         if (!res.ok) {
@@ -36,28 +40,22 @@ function TransactionStatus({ authToken }) {
       .catch(err => setError(err.message));
   }, [authToken]);
 
-  // A helper to figure out "pending with" from the tasks for a given transaction
+  // Helper: figure out "pending with" from the tasks for a given transaction
   const findPendingApprovers = (txnId) => {
-    // Filter tasks that match this transaction
-    // -- This requires that your tasks or your engine store a variable "transactionId"
-    // If your TaskDto has no direct reference to transactionId,
-    // you might need to fetch "process variables" or find some other linking logic.
+    // Filter tasks matching this transaction if taskDto has 'transactionId'
     const relevantTasks = tasks.filter(t => t.transactionId === txnId);
 
     if (relevantTasks.length === 0) {
       return "No Pending Approvals"; 
     }
 
-    // Build a string listing each task's assignee/candidates
-    // If your tasks have "assignee" or candidate info, you might store them in TaskDto
-    // Example: if t.assignee is null but t.candidateUsers === "cfo"
+    // Build a string listing each task's assignee or 'Unassigned'
     return relevantTasks
       .map(t => {
         if (t.assignee) {
           return `Assigned to: ${t.assignee}`;
-        } 
-        // If your Dto has candidateUsers or candidateGroups, do something like:
-        // else if (t.candidateUsers) return `Candidate: ${t.candidateUsers}`;
+        }
+        // If you have candidateUsers/candidateGroups, you'd display that here
         return 'Unassigned';
       })
       .join(', ');
@@ -68,20 +66,22 @@ function TransactionStatus({ authToken }) {
   }
 
   return (
-    <div style={{ margin: '1rem' }}>
-      <h2>Transaction Status</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <Container className="mt-4">
+      <h2 className="mb-4">Transaction Status</h2>
+
+      {error && <p className="text-danger">{error}</p>}
 
       {transactions.length === 0 ? (
         <p>No transactions found.</p>
       ) : (
-        <table border="1" cellPadding="6" style={{ borderCollapse: 'collapse' }}>
+        <Table striped bordered hover>
           <thead>
             <tr>
               <th>ID</th>
               <th>Amount</th>
               <th>Status</th>
               <th>Pending With</th>
+              <th>Description</th>
             </tr>
           </thead>
           <tbody>
@@ -91,12 +91,13 @@ function TransactionStatus({ authToken }) {
                 <td>{tx.amount}</td>
                 <td>{tx.status}</td>
                 <td>{findPendingApprovers(tx.id)}</td>
+                <td>{tx.description}</td>
               </tr>
             ))}
           </tbody>
-        </table>
+        </Table>
       )}
-    </div>
+    </Container>
   );
 }
 

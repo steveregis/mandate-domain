@@ -1,0 +1,17 @@
+/* styles.css */
+.app-container {
+    padding: 1.5rem;
+    background-color: #f8f9fa; /* slightly off-white for main area */
+  }
+  
+  .app-title {
+    margin-top: 1rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+  }
+  
+  .form-section {
+    margin-top: 1rem;
+  }
+  /* etc. */
+  

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Container, Table, Button } from 'react-bootstrap';
+import '../styles/styles.css'; // your custom styles
 import { BACKEND_URL } from '../config';
 
 function TaskList({ authToken, currentUserId }) {
@@ -13,8 +15,9 @@ function TaskList({ authToken, currentUserId }) {
 
   const fetchTasks = () => {
     setLoading(true);
-    const url = `${BACKEND_URL}/api/workflow/tasks`; 
-    // If you only want tasks for currentUserId, you might do ?assignee=${currencurrentUserIdtUser}
+    // If you only want tasks relevant to currentUserId, you might do:
+    // const url = `${BACKEND_URL}/api/workflow/tasks?assignee=${currentUserId}`;
+    const url = `${BACKEND_URL}/api/workflow/tasks`;
 
     fetch(url, {
       headers: { Authorization: `Basic ${authToken}` }
@@ -77,17 +80,16 @@ function TaskList({ authToken, currentUserId }) {
     return <div>Loading tasks...</div>;
   }
 
-  if (error) {
-    return <div style={{ color: 'red' }}>Error: {error}</div>;
-  }
-
   return (
-    <div style={{ margin: '1rem' }}>
-      <h2>Workflow Tasks</h2>
+    <Container className="mt-4">
+      <h2 className="mb-4">Workflow Tasks</h2>
+
+      {error && <p className="text-danger">Error: {error}</p>}
+
       {tasks.length === 0 ? (
         <p>No tasks found.</p>
       ) : (
-        <table border="1" cellPadding="6" style={{ borderCollapse: 'collapse' }}>
+        <Table striped bordered hover>
           <thead>
             <tr>
               <th>Task ID</th>
@@ -100,11 +102,11 @@ function TaskList({ authToken, currentUserId }) {
           </thead>
           <tbody>
             {tasks.map(task => {
-              // Debug line: see exact values for each row
+              // Debug line or remove in production
               console.log(
-                "Debug Row -> Task ID:", task.id,
-                "Assignee=", task.assignee,
-                "currentUser=", currentUserId
+                "Debug Task:", task.id,
+                "Assignee:", task.assignee,
+                "CurrentUser:", currentUserId
               );
 
               return (
@@ -115,30 +117,38 @@ function TaskList({ authToken, currentUserId }) {
                   <td>{task.transactionId || '-'}</td>
                   <td>{task.processInstanceId || '-'}</td>
                   <td>
-                    {/* Show Claim button if assignee == null/empty */}
                     {(!task.assignee?.toLowerCase() || task.assignee?.toLowerCase() === '') && (
-                      <button onClick={() => handleClaim(task.id)}>
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        className="me-2"
+                        onClick={() => handleClaim(task.id)}
+                      >
                         Claim
-                      </button>
+                      </Button>
                     )}
 
-                    {/* Show Complete button if assignee == currentUserId */}
-                    {(task.assignee?.toLowerCase() === currentUserId?.toLowerCase()) && (
-                      <button onClick={() => handleComplete(task.id)}>
+                    {task.assignee?.toLowerCase() === currentUserId?.toLowerCase() && (
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        onClick={() => handleComplete(task.id)}
+                      >
                         Complete
-                      </button>
+                      </Button>
                     )}
                   </td>
                 </tr>
               );
             })}
           </tbody>
-        </table>
+        </Table>
       )}
-      <button onClick={fetchTasks} style={{ marginTop: '1rem' }}>
+
+      <Button variant="info" onClick={fetchTasks} className="mt-3">
         Refresh
-      </button>
-    </div>
+      </Button>
+    </Container>
   );
 }
 

@@ -49,7 +49,7 @@ public class SecurityConfig {
         // 2. Configure which routes are permitted/authorized
         http.authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/hello", "/auth/**").permitAll()
-            .requestMatchers("/api/mandates/**", "/api/signatories/**", "/api/rules/**","/api/workflow/**").authenticated()
+            .requestMatchers("/api/mandates/**", "/api/signatories/**", "/api/rules/**","/api/workflow/**","/generate-feel/**","/chat/**","/generate-dmn/**").authenticated()
             .anyRequest().authenticated()
         );
 

@@ -37,6 +37,7 @@ public class MandateController {
         Mandate existing = mandateRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mandate not found, id: " + id));
 
+        existing.setAccountType(updated.getAccountType());
         existing.setAccountId(updated.getAccountId());
         existing.setStatus(updated.getStatus());
         existing.setValidFrom(updated.getValidFrom());

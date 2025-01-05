@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Container, Form, Button, Row, Col } from 'react-bootstrap';
+import '../styles/styles.css'; // same stylesheet as CreateMandate for consistent styling
 import { BACKEND_URL } from '../config';
 
 function CreateSignatory({ authToken }) {
@@ -10,102 +12,120 @@ function CreateSignatory({ authToken }) {
   const [mandates, setMandates] = useState([]);
   const [selectedMandateId, setSelectedMandateId] = useState('');
 
-  // 1) On component mount, fetch the mandates so the user can pick which Mandate to link
   useEffect(() => {
+    if (!authToken) return;
+
     fetch(`${BACKEND_URL}/api/mandates`, {
       headers: {
-        'Authorization': `Basic ${authToken}`
+        Authorization: `Basic ${authToken}`
       }
     })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Failed to fetch mandates: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => setMandates(data))
       .catch(err => console.error('Failed to fetch mandates:', err));
   }, [authToken]);
 
-  // 2) Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // We expect that `selectedMandateId` is a valid number/string
     if (!selectedMandateId) {
       alert('Please select a mandate.');
       return;
     }
 
-    // Prepare the body
     const signatoryData = {
-      userName: fullName,   // or userName if your backend expects userName
+      userName: fullName,  // adjust if your backend expects a different field name
       displayName: fullName,
-      roleName: role        // or 'role' if that matches your domain
+      roleName: role
     };
 
-    // 3) POST to /api/signatories/mandate/{selectedMandateId}
     fetch(`${BACKEND_URL}/api/signatories/mandate/${selectedMandateId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Basic ${authToken}`
+        Authorization: `Basic ${authToken}`
       },
       body: JSON.stringify(signatoryData)
     })
-    .then(res => {
-      if (!res.ok) {
-        throw new Error(`Failed to create signatory, status: ${res.status}`);
-      }
-      return res.json();
-    })
-    .then(data => {
-      console.log('Created signatory:', data);
-      // Navigate back to signatories list (or wherever you like)
-      navigate('/signatories');
-    })
-    .catch(err => {
-      console.error(err);
-      alert(`Error creating signatory: ${err.message}`);
-    });
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Failed to create signatory: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        console.log('Created signatory:', data);
+        navigate('/signatories'); // go back to signatory list or wherever
+      })
+      .catch(err => {
+        console.error(err);
+        alert(`Error creating signatory: ${err.message}`);
+      });
   };
 
+  if (!authToken) {
+    return <div>Please log in to create a signatory.</div>;
+  }
+
   return (
-    <div>
-      <h2>Create Signatory</h2>
+    <Container className="mt-4">
+      <h2 className="mb-4">Create Signatory</h2>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Full Name:</label><br />
-          <input
-            type="text"
-            value={fullName}
-            onChange={e => setFullName(e.target.value)}
-          />
-        </div>
+      <Form onSubmit={handleSubmit}>
+        {/* Full Name */}
+        <Form.Group as={Row} className="mb-3">
+          <Form.Label column sm="2">Full Name</Form.Label>
+          <Col sm="10">
+            <Form.Control
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+            />
+          </Col>
+        </Form.Group>
 
-        <div>
-          <label>Role:</label><br />
-          <input
-            type="text"
-            value={role}
-            onChange={e => setRole(e.target.value)}
-          />
-        </div>
+        {/* Role */}
+        <Form.Group as={Row} className="mb-3">
+          <Form.Label column sm="2">Role</Form.Label>
+          <Col sm="10">
+            <Form.Control
+              type="text"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            />
+          </Col>
+        </Form.Group>
 
-        <div>
-          <label>Select Mandate:</label><br />
-          <select
-            value={selectedMandateId}
-            onChange={e => setSelectedMandateId(e.target.value)}
-          >
-            <option value="">-- Choose a Mandate --</option>
-            {mandates.map(m => (
-              <option key={m.id} value={m.id}>
-                {m.id} - {m.accountId} ({m.status})
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Select Mandate */}
+        <Form.Group as={Row} className="mb-3">
+          <Form.Label column sm="2">Mandate</Form.Label>
+          <Col sm="10">
+            <Form.Select
+              value={selectedMandateId}
+              onChange={(e) => setSelectedMandateId(e.target.value)}
+              required
+            >
+              <option value="">-- Choose a Mandate --</option>
+              {mandates.map(m => (
+                <option key={m.id} value={m.id}>
+                  {m.id} - {m.accountId} ({m.status})
+                </option>
+              ))}
+            </Form.Select>
+          </Col>
+        </Form.Group>
 
-        <button type="submit">Create Signatory</button>
-      </form>
-    </div>
+        <Button variant="primary" type="submit">
+          Create Signatory
+        </Button>
+      </Form>
+    </Container>
   );
 }
 

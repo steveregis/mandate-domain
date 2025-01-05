@@ -11,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost","http://localhost:3000","https://mandate-frontend-web.azurewebsites.net")
+                .allowedOrigins("http://localhost","http://localhost:3000","https://mandate-frontend-web.azurewebsites.net","http://localhost:8000/")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
 
         

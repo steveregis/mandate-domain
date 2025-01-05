@@ -1,112 +1,80 @@
-import React, { useState,useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom'; // or whichever routing you use
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Container, Table, Button } from 'react-bootstrap';
+import '../styles/styles.css'; // Your custom or shared CSS
 import { BACKEND_URL } from '../config';
 
-function SignatoryCreate({ authToken }) {
-  const navigate = useNavigate();
+function SignatoryList({ authToken }) {
+  const [signatories, setSignatories] = useState([]);
+  const [error, setError] = useState('');
 
-  const [fullName, setFullName] = useState('');
-  const [role, setRole] = useState('');
-  const [mandates, setMandates] = useState([]);
-  const [selectedMandateId, setSelectedMandateId] = useState('');
-
-  // 1) On component mount, fetch the mandates so the user can pick which Mandate to link
   useEffect(() => {
-    fetch(`${BACKEND_URL}/api/mandates`, {
+    if (!authToken) return;
+
+    fetch(`${BACKEND_URL}/api/signatories`, {
       headers: {
-        'Authorization': `Basic ${authToken}`
+        Authorization: `Basic ${authToken}`
       }
     })
-      .then(res => res.json())
-      .then(data => setMandates(data))
-      .catch(err => console.error('Failed to fetch mandates:', err));
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Failed to fetch signatories: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(data => setSignatories(data))
+      .catch(err => setError(err.message));
   }, [authToken]);
 
-  // 2) Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // We expect that `selectedMandateId` is a valid number/string
-    if (!selectedMandateId) {
-      alert('Please select a mandate.');
-      return;
-    }
-
-    // Prepare the body
-    const signatoryData = {
-      userName: fullName,   // or userName if your backend expects userName
-      displayName: fullName,
-      roleName: role        // or 'role' if that matches your domain
-    };
-
-    // 3) POST to /api/signatories/mandate/{selectedMandateId}
-    fetch(`${BACKEND_URL}/api/signatories/mandate/${selectedMandateId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Basic ${authToken}`
-      },
-      body: JSON.stringify(signatoryData)
-    })
-    .then(res => {
-      if (!res.ok) {
-        throw new Error(`Failed to create signatory, status: ${res.status}`);
-      }
-      return res.json();
-    })
-    .then(data => {
-      console.log('Created signatory:', data);
-      // Navigate back to signatories list (or wherever you like)
-      navigate('/signatories');
-    })
-    .catch(err => {
-      console.error(err);
-      alert(`Error creating signatory: ${err.message}`);
-    });
-  };
+  if (!authToken) {
+    return <div>Please log in to view signatories.</div>;
+  }
 
   return (
-    <div>
-      <h2>Create Signatory</h2>
+    <Container className="mt-4">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2 className="mb-0">Signatory List</h2>
+        <Link to="/signatories/create">
+          <Button variant="primary">Create New Signatory</Button>
+        </Link>
+      </div>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Full Name:</label><br />
-          <input
-            type="text"
-            value={fullName}
-            onChange={e => setFullName(e.target.value)}
-          />
-        </div>
+      {error && <p className="text-danger">Error: {error}</p>}
 
-        <div>
-          <label>Role:</label><br />
-          <input
-            type="text"
-            value={role}
-            onChange={e => setRole(e.target.value)}
-          />
-        </div>
-
-        <div>
-          <label>Select Mandate:</label><br />
-          <select
-            value={selectedMandateId}
-            onChange={e => setSelectedMandateId(e.target.value)}
-          >
-            <option value="">-- Choose a Mandate --</option>
-            {mandates.map(m => (
-              <option key={m.id} value={m.id}>
-                {m.id} - {m.accountId} ({m.status})
-              </option>
+      {signatories.length === 0 ? (
+        <p>No signatories found.</p>
+      ) : (
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>User Name</th>
+              <th>Display Name</th>
+              <th>Role Name</th>
+              <th>Mandate</th>
+            </tr>
+          </thead>
+          <tbody>
+            {signatories.map(sig => (
+              <tr key={sig.id}>
+                <td>{sig.id}</td>
+                <td>{sig.userName}</td>
+                <td>{sig.displayName}</td>
+                <td>{sig.roleName}</td>
+                <td>
+                  {/* If signatory references Mandate, e.g. sig.mandate.id, sig.mandate.accountId */}
+                  {sig.mandate
+                    ? `Mandate #${sig.mandate.id} (${sig.mandate.accountId})`
+                    : '-'
+                  }
+                </td>
+              </tr>
             ))}
-          </select>
-        </div>
-
-        <button type="submit">Create Signatory</button>
-      </form>
-    </div>
+          </tbody>
+        </Table>
+      )}
+    </Container>
   );
 }
 
-export default SignatoryCreate;
+export default SignatoryList;

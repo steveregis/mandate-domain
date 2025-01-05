@@ -17,6 +17,8 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private TransactionStatus status; 
     // e.g., INITIATED, PENDING_APPROVAL, APPROVED, REJECTED, EXECUTED
+    private String description;
+
 
     private LocalDateTime createdOn;
 
@@ -90,5 +92,13 @@ public class Transaction {
 
     public void setStatus(TransactionStatus status) {
         this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -25,7 +25,7 @@ function NavBar({ authToken, onLogout }) {
 
       <Link to="/transaction-status" style={{ marginRight: '1rem' }}>Transaction Status</Link>
 
-
+      <Link to="/rule-assistant"> Rule Assistant </Link>
 
       <button onClick={onLogout}>Logout</button>
     </nav>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-
-// Optional: if you have a config.js that exports BACKEND_URL, import it:
-import { BACKEND_URL } from '../config';
+import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import { BACKEND_URL } from '../config'; // or wherever your config is
+import '../styles/styles.css'; // optional custom styles
 
 function CreateTransaction({ authToken }) {
   // Local component states
@@ -9,6 +9,7 @@ function CreateTransaction({ authToken }) {
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('USD');
   const [status, setStatus] = useState('INITIATED');
+  const [description, setDescription] = useState(''); 
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -17,14 +18,13 @@ function CreateTransaction({ authToken }) {
     setMessage('');
     setError('');
 
-    // If you do not have a config, you can directly use "http://localhost:8080"
     const url = `${BACKEND_URL}/api/transactions/mandate/${mandateId}`;
 
-    // Build the JSON body
     const newTxn = {
-      amount: parseFloat(amount), // parse float if needed
+      amount: parseFloat(amount),
       currency,
-      status
+      status,
+      description
     };
 
     fetch(url, {
@@ -42,7 +42,6 @@ function CreateTransaction({ authToken }) {
         return res.json();
       })
       .then(data => {
-        // data is the Transaction object returned by your backend
         setMessage(`Transaction created with ID: ${data.id}, amount: ${data.amount}`);
       })
       .catch(err => setError(err.message));
@@ -53,56 +52,87 @@ function CreateTransaction({ authToken }) {
   }
 
   return (
-    <div style={{ margin: '1rem' }}>
-      <h2>Create Transaction</h2>
+    <Container className="mt-4">
+      <h2 className="mb-4">Create Transaction</h2>
+      
+      {error && <p className="text-danger">Error: {error}</p>}
+      {message && <p className="text-success">{message}</p>}
 
-      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-      {message && <p style={{ color: 'green' }}>{message}</p>}
+      <Form onSubmit={handleSubmit}>
+        {/* Mandate ID */}
+        <Form.Group as={Row} className="mb-3" controlId="formMandateId">
+          <Form.Label column sm="2">Mandate ID</Form.Label>
+          <Col sm="10">
+            <Form.Control
+              type="number"
+              value={mandateId}
+              onChange={(e) => setMandateId(e.target.value)}
+              required
+            />
+          </Col>
+        </Form.Group>
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '0.5rem' }}>
-          <label>Mandate ID: </label>
-          <input
-            type="number"
-            value={mandateId}
-            onChange={e => setMandateId(e.target.value)}
-            required
-          />
-        </div>
+        {/* Amount */}
+        <Form.Group as={Row} className="mb-3" controlId="formAmount">
+          <Form.Label column sm="2">Amount</Form.Label>
+          <Col sm="10">
+            <Form.Control
+              type="number"
+              step="0.01"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              required
+            />
+          </Col>
+        </Form.Group>
 
-        <div style={{ marginBottom: '0.5rem' }}>
-          <label>Amount: </label>
-          <input
-            type="number"
-            step="0.01"
-            value={amount}
-            onChange={e => setAmount(e.target.value)}
-            required
-          />
-        </div>
+        {/* Currency */}
+        <Form.Group as={Row} className="mb-3" controlId="formCurrency">
+          <Form.Label column sm="2">Currency</Form.Label>
+          <Col sm="10">
+            <Form.Control
+              type="text"
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+            />
+          </Col>
+        </Form.Group>
 
-        <div style={{ marginBottom: '0.5rem' }}>
-          <label>Currency: </label>
-          <input
-            type="text"
-            value={currency}
-            onChange={e => setCurrency(e.target.value)}
-          />
-        </div>
+        {/* Status */}
+        <Form.Group as={Row} className="mb-3" controlId="formStatus">
+          <Form.Label column sm="2">Status</Form.Label>
+          <Col sm="10">
+            <Form.Select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <option value="INITIATED">INITIATED</option>
+              <option value="PENDING_APPROVAL">PENDING_APPROVAL</option>
+              <option value="APPROVED">APPROVED</option>
+              <option value="REJECTED">REJECTED</option>
+            </Form.Select>
+          </Col>
+        </Form.Group>
 
-        <div style={{ marginBottom: '0.5rem' }}>
-          <label>Status: </label>
-          <select value={status} onChange={e => setStatus(e.target.value)}>
-            <option value="INITIATED">INITIATED</option>
-            <option value="PENDING_APPROVAL">PENDING_APPROVAL</option>
-            <option value="APPROVED">APPROVED</option>
-            <option value="REJECTED">REJECTED</option>
-          </select>
-        </div>
+        {/* Description */}
+        <Form.Group as={Row} className="mb-3" controlId="formDescription">
+          <Form.Label column sm="2">Description</Form.Label>
+          <Col sm="10">
+            <Form.Control
+              as="textarea"
+              rows={2}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Office Supplies, Consulting Invoice, etc."
+            />
+          </Col>
+        </Form.Group>
 
-        <button type="submit">Create Transaction</button>
-      </form>
-    </div>
+        <Button variant="primary" type="submit">
+          Create Transaction
+        </Button>
+      </Form>
+    </Container>
   );
 }
 
