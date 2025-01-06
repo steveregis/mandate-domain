@@ -1,7 +1,9 @@
 # Mandate Management System (Minimal Yet Extensible)
 
-A **Spring Boot + Camunda + React** (or React Native) application for **bank mandate** management and **approval workflows**. This solution is a **solid foundation** for multi-sign-off approvals, featuring flexible signatories (no role hardcoding), 
-threshold-based logic, and a proof-of-concept UI to validate core domain models and BPMN flows.
+This reference application pairs **Spring Boot**, **Camunda (for BPMN/DMN execution)**, and **React** to demonstrate how **multi-sign-off approvals**, **threshold-based logic**, and **flexible signatories** can be modeled and automated. By separating the “what” (business logic and decisions in DMN) from the “how” (process flows in BPMN), teams can adapt quickly to changing business requirements **without hardcoding roles or rules**. A minimal UI serves as a proof of concept to validate key domain models, approvals, and process flows. This makes it an ideal starting point for bank mandate management—or any scenario where controlled, auditable workflows are paramount.
+
+Leveraging **BPMN (Business Process Model and Notation)** and **DMN (Decision Model and Notation)** offers a clear, visual way to define and **automate complex business processes and decisions**. For business leaders, BPMN diagrams provide an intuitive view of **how tasks flow from one stage to the next**, while DMN tables make **rules and thresholds transparent and easily adjustable**. For developers, these same models translate into robust, executable workflows and decisions that integrate seamlessly with microservices and modern front-end frameworks.
+
 
 Also includes a Smart Rule Assistant POC which is a **FastAPI** application that leverages the **NVIDIA Mixtral model** to provide **intelligent parsing and conversion of natural language rules into Mandate Rules expressed as FEEL expressions and DMN decision tables**. this will enable self service 
 
