@@ -3,7 +3,7 @@
 A **Spring Boot + Camunda + React** (or React Native) application for **bank mandate** management and **approval workflows**. This solution is a **solid foundation** for multi-sign-off approvals, featuring flexible signatories (no role hardcoding), 
 threshold-based logic, and a proof-of-concept UI to validate core domain models and BPMN flows.
 
-Also includes a POC **FastAPI** application that leverages the **NVIDIA Mixtral model** to provide **intelligent parsing and conversion of natural language rules into FEEL expressions and DMN decision tables**.
+Also includes a Smart Rule Assistant POC which is a **FastAPI** application that leverages the **NVIDIA Mixtral model** to provide **intelligent parsing and conversion of natural language rules into Mandate Rules expressed as FEEL expressions and DMN decision tables**. this will enable self service 
 
 ## 1. Project Goal & Description
 
