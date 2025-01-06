@@ -654,8 +654,9 @@ How to Use:
 2. **Docker & CI/CD**
    - Containerize backend + frontend; use GitHub Actions/Jenkins for deployment.
 
-3. **Advanced BPMN**
+3. ** Develop DMN and Advanced BPMN**
    - Add rejection paths, escalation timers; multi-level approvals (CFO + Board).
+   - Include DMN use cases
 
 4. **Polished UI**
    - Move beyond the minimal test harness to a robust design-friendly interface with real-time notifications or form validations.
